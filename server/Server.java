@@ -11,6 +11,8 @@ public class Server {
 		}
 		
 		try {
+			Bibliography bib = new Bibliography();
+			
 			int port = Integer.parseInt(args[0]);
 			
 			System.out.println("Starting server on port " + port);
@@ -22,7 +24,7 @@ public class Server {
 				
 				Socket client = server.accept();
 				
-				Thread clientThread = new Thread(new ClientThread(client));
+				Thread clientThread = new Thread(new ClientThread(client, bib));
 				
 				clientThread.start();
 				
