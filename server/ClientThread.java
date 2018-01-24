@@ -52,7 +52,7 @@ public class ClientThread extends Thread {
 			bib.Update(data.book);
 		}
 		else if(data.msg.startsWith("GET")) {
-			// out.write(book.tostring or something);
+			bib.Get(data);
 		}
 		else if(data.msg.startsWith("REMOVE")) {
 			bib.Remove(data.book);

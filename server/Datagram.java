@@ -2,6 +2,7 @@
 public class Datagram {
 	public String msg = null;
 	public Book book = null;
+	public boolean getAll = false;
 	
 	public Datagram(String data) {
 		String[] arr = data.split("\n");
@@ -11,6 +12,11 @@ public class Datagram {
 		this.book = new Book();
 		
 		for(int i = 1; i < arr.length; i++) {
+			if(arr[i].startsWith("ALL")) {
+				getAll = true;
+				return;
+			}
+			
 			int index = arr[i].indexOf(' ');
 			String element = arr[i].substring(0, index);
 			String payload = arr[i].substring(index, arr[i].length() - 1);
