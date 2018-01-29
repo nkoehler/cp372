@@ -43,6 +43,10 @@ public class ServerThread extends Thread {
 					"AUTHOR Koehler_" + 
 					"YEAR 2018");
 			
+			output.println(
+					"REMOVE_" + 
+					"ISBN 9783161484100_");
+			
 			System.out.println("Sent data.");
 		}
 		catch(UnknownHostException e) {

@@ -24,8 +24,6 @@ public class ClientThread extends Thread {
 				
 				Datagram d = new Datagram(msg);
 				
-				System.out.print(d.book.toString());
-				
 				parse(d, output);
 				
 				msg = "";
@@ -59,6 +57,6 @@ public class ClientThread extends Thread {
 			bib.Remove(data.book);
 		}
 		
-		//System.out.println(bib.toString());
+		System.out.println(bib.toString());
 	}
 }

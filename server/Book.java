@@ -23,7 +23,6 @@ public class Book {
 	}
 	
 	public Book Update(Book b) {
-		System.out.print(b.toString());
 		if(!b.year.isEmpty())
 			this.year = b.year;
 		if(!b.title.isEmpty())
