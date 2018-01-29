@@ -54,9 +54,17 @@ public class Bibliography {
 					break;
 				}
 				
-				// algorithm goes here
+				if(
+						(b.title.isEmpty() || tmp.title.equals(b.title)) &&
+						(b.author.isEmpty() || tmp.author.equals(b.author)) &&
+						(b.publisher.isEmpty() || tmp.publisher.equals(b.publisher)) &&
+						(b.year.isEmpty() || tmp.year.equals(b.year))
+						) {
+					books.add(tmp);
+					
+				}
+					
 			}
-			
 			
 			String s = "";
 			for(int i = 0; i < books.size(); i++)
