@@ -19,17 +19,31 @@ public class ServerThread extends Thread {
 	public void run() {
 		try {
 			this.server = new Socket(this.host, this.port);
+			System.out.println("Connected to server " + this.server.getInetAddress().toString() + " : " + this.server.getLocalPort());
 			
 			BufferedReader input = new BufferedReader(new InputStreamReader(this.server.getInputStream()));
 			PrintWriter output = new PrintWriter(this.server.getOutputStream(), true);
 		
-			output.print(
-					"SUBMIT\r\n" + 
-					"ISBN 9783161484100\r\n" + 
-					"TITLE Modular Algorithms in Symbolic Summation and Symbolic Integration\r\n" + 
-					"AUTHOR Gerhard\r\n" + 
-					"PUBLISHER Mir\r\n" +
-					"\r\n");
+			output.println(
+					"SUBMIT_" + 
+					"ISBN 9783161484100_" + 
+					"TITLE Modular Algorithms in Symbolic Summation and Symbolic Integration_" + 
+					"AUTHOR Gerhard_" + 
+					"PUBLISHER Mir");
+			
+			output.println(
+					"SUBMIT_" + 
+					"ISBN 9783161484101_" + 
+					"TITLE Nick's Guide On How To Get Graham To Do Something_" + 
+					"YEAR 2018");
+			
+			output.println(
+					"UPDATE_" + 
+					"ISBN 9783161484100_" + 
+					"AUTHOR Koehler_" + 
+					"YEAR 2018");
+			
+			System.out.println("Sent data.");
 		}
 		catch(UnknownHostException e) {
 			System.err.println("Unable to find host '" + this.host + "'.");
@@ -43,6 +57,7 @@ public class ServerThread extends Thread {
 		finally {
 			try {
 				this.server.close();
+				System.out.println("Disconnected.");
 			}
 			catch (IOException e) {
 				e.printStackTrace();

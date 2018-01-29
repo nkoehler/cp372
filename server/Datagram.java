@@ -5,7 +5,7 @@ public class Datagram {
 	public boolean getAll = false;
 	
 	public Datagram(String data) {
-		String[] arr = data.split("\n");
+		String[] arr = data.split("_");
 		
 		this.msg = arr[0];
 		
@@ -19,11 +19,11 @@ public class Datagram {
 			
 			int index = arr[i].indexOf(' ');
 			String element = arr[i].substring(0, index);
-			String payload = arr[i].substring(index, arr[i].length() - 1);
+			String payload = arr[i].substring(index + 1, arr[i].length());
 			
 			switch(element) {
 			case "ISBN":
-				this.book.isbn = Integer.parseInt(payload);
+				this.book.isbn = payload;
 				break;
 			
 			case "TITLE":
@@ -39,7 +39,7 @@ public class Datagram {
 				break;
 				
 			case "YEAR":
-				this.book.year = Integer.parseInt(payload);
+				this.book.year = payload;
 				break;
 			}
 		}

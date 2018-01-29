@@ -15,15 +15,16 @@ public class ClientThread extends Thread {
 	
 	public void run() {
 		try {
-			// read client commands in the future
 			BufferedReader input = new BufferedReader(new InputStreamReader(this.client.getInputStream()));
 			PrintWriter output = new PrintWriter(this.client.getOutputStream(), true);
 			
 			String msg = "";
-			while(true) {
-				while((msg += input.readLine()) != null);
+			while((msg = input.readLine()) != null) {
+				//System.out.println(msg.replace('_', ' '));
 				
 				Datagram d = new Datagram(msg);
+				
+				System.out.print(d.book.toString());
 				
 				parse(d, output);
 				
@@ -57,5 +58,7 @@ public class ClientThread extends Thread {
 		else if(data.msg.startsWith("REMOVE")) {
 			bib.Remove(data.book);
 		}
+		
+		//System.out.println(bib.toString());
 	}
 }
