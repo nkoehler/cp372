@@ -16,8 +16,8 @@ public class ClientThread extends Thread {
 	public void run() {
 		try {
 			// read client commands in the future
-			BufferedReader input = new BufferedReader(new InputStreamReader(client.getInputStream()));
-			PrintWriter output = new PrintWriter(client.getOutputStream(), true);
+			BufferedReader input = new BufferedReader(new InputStreamReader(this.client.getInputStream()));
+			PrintWriter output = new PrintWriter(this.client.getOutputStream(), true);
 			
 			String msg = "";
 			while(true) {

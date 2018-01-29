@@ -35,6 +35,13 @@ public class ClientFrame {
 	 */
 	public ClientFrame() {
 		initialize();
+		ConnectToServer();
+	}
+	
+	public void ConnectToServer() {
+		Thread serverThread = new Thread(new ServerThread("localhost", 5656));
+		
+		serverThread.start();
 	}
 
 	/**
