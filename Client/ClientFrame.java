@@ -65,18 +65,24 @@ public class ClientFrame {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
-		JButton btnSend_Command = new JButton("Send");
-		btnSend_Command.addActionListener(new ActionListener() {
+		JButton btnSend = new JButton("Send");
+		btnSend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
-				//send button
+				Message message = new Message(textField_Type.getText(),textField_ISBN.getText(),textField_Title.getText(),textField_Author.getText(),textField_Publisher.getText(),textField_Year.getText());
+				if(message.validate()) {
+					message.format();
+					// send message.message
+					
+				}else {
+					//display error on the display pane
+				}
 			}
 		});
-		btnSend_Command.setBounds(355, 38, 89, 23);
-		frame.getContentPane().add(btnSend_Command);
+		btnSend.setBounds(355, 38, 89, 23);
+		frame.getContentPane().add(btnSend);
 		
-		JButton btnClear_Response = new JButton("Clear");
-		btnClear_Response.addActionListener(new ActionListener() {
+		JButton btnClear = new JButton("Clear");
+		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				textField_Type.setText("");
 				textField_ISBN.setText("");
@@ -84,11 +90,10 @@ public class ClientFrame {
 				textField_Author.setText("");
 				textField_Publisher.setText("");
 				textField_Year.setText("");
-				//bottom clear button
 			}
 		});
-		btnClear_Response.setBounds(355, 72, 89, 23);
-		frame.getContentPane().add(btnClear_Response);
+		btnClear.setBounds(355, 72, 89, 23);
+		frame.getContentPane().add(btnClear);
 		
 		textField_Type = new JTextField();
 		textField_Type.setBounds(10, 39, 314, 20);
@@ -144,8 +149,18 @@ public class ClientFrame {
 		frame.getContentPane().add(textField_Year);
 		textField_Year.setColumns(10);
 		
-		JTextArea textArea = new JTextArea();
-		textArea.setBounds(467, 37, 307, 298);
-		frame.getContentPane().add(textArea);
+		JButton btnGetAll = new JButton("Get All");
+		btnGetAll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String message = "GET_ALL";
+				//send message
+			}
+		});
+		btnGetAll.setBounds(355, 106, 89, 23);
+		frame.getContentPane().add(btnGetAll);
+		
+		JTextPane display = new JTextPane();
+		display.setBounds(454, 38, 320, 295);
+		frame.getContentPane().add(display);
 	}
 }
