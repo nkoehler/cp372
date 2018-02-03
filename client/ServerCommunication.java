@@ -46,8 +46,7 @@ public class ServerCommunication {
 	
 	public void Close() {
 		try {
-			this.input.close();
-			this.output.close();
+			this.readThread.interrupt();
 			this.server.close();
 			System.out.println("Disconnected.");
 		}

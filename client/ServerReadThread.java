@@ -1,6 +1,5 @@
 import java.io.BufferedReader;
 import java.io.IOException;
-
 import javax.swing.JTextPane;
 
 public class ServerReadThread extends Thread {
@@ -17,12 +16,12 @@ public class ServerReadThread extends Thread {
 		String msg = "";
 		try {
 			while((msg = this.input.readLine()) != null) {
-				this.display.setText(msg);
+				this.display.setText(this.display.getText() + msg + "\n");
 				
 				msg = "";
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 	

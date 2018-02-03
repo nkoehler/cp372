@@ -18,10 +18,31 @@ public class Bibliography {
 	}
 	
 	public synchronized String Remove(Book b) {
-		if(this.list.removeIf(obj -> obj.isbn.equals(b.isbn)))
-			return "Book successfully removed.";
+		ArrayList<Book> books = new ArrayList<Book>();
+		
+		for(int i = 0; i < this.list.size(); i++) {
+			Book tmp = this.list.get(i);
+			
+			if(		
+					(b.isbn.isEmpty() || tmp.isbn.equals(b.isbn)) &&
+					(b.title.isEmpty() || tmp.title.equals(b.title)) &&
+					(b.author.isEmpty() || tmp.author.equals(b.author)) &&
+					(b.publisher.isEmpty() || tmp.publisher.equals(b.publisher)) &&
+					(b.year.isEmpty() || tmp.year.equals(b.year))
+					) {
+				books.add(tmp);
+				
+			}
+				
+		}
+		
+		for(int i = 0; i < books.size(); i++)
+			this.list.remove(books.get(i));
+		
+		if(books.size() > 0)
+			return "Book(s) successfully removed.";
 		else
-			return "Book does not exist in bibliography.";
+			return "Book(s) does not exist in bibliography.";
 	}
 	
 	public synchronized String Update(Book b) {
@@ -37,10 +58,7 @@ public class Bibliography {
 	
 	public String Get(Datagram data) {
 		if(data.getAll) {
-			String s = "";
-			for(int i = 0; i < this.list.size(); i++)
-				s += this.list.get(i).toString();
-			return s;
+			return this.toString();
 		}
 		else {
 			Book b = data.book;
@@ -49,12 +67,8 @@ public class Bibliography {
 			for(int i = 0; i < this.list.size(); i++) {
 				Book tmp = this.list.get(i);
 				
-				if(!tmp.isbn.isEmpty() && tmp.isbn.equals(b.isbn)) {
-					books.add(tmp);
-					break;
-				}
-				
 				if(
+						(b.isbn.isEmpty() || tmp.isbn.equals(b.isbn)) &&
 						(b.title.isEmpty() || tmp.title.equals(b.title)) &&
 						(b.author.isEmpty() || tmp.author.equals(b.author)) &&
 						(b.publisher.isEmpty() || tmp.publisher.equals(b.publisher)) &&
@@ -67,8 +81,13 @@ public class Bibliography {
 			}
 			
 			String s = "";
-			for(int i = 0; i < books.size(); i++)
-				s += books.get(i).toString();
+			
+			if(books.size() > 0)
+				for(int i = 0; i < books.size(); i++)
+					s += books.get(i).toString();
+			else
+				s = "Book(s) does not exist in bibliography.";
+			
 			return s;
 		}
 	}

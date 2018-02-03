@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
 public class ClientFrame {
@@ -106,6 +107,7 @@ public class ClientFrame {
 				textField_Author.setText("");
 				textField_Publisher.setText("");
 				textField_Year.setText("");
+				display.setText("");
 			}
 		});
 		btnClear.setBounds(355, 72, 89, 23);
@@ -177,6 +179,10 @@ public class ClientFrame {
 		
 		display = new JTextPane();
 		display.setBounds(454, 38, 320, 295);
-		frame.getContentPane().add(display);
+		//frame.getContentPane().add(display);
+		
+		JScrollPane sp = new JScrollPane(display);
+		sp.setBounds(454, 38, 320, 295);
+	    frame.getContentPane().add(sp);
 	}
 }
