@@ -77,6 +77,6 @@ public class Message {
 		if(this.year != "") {
 			this.message = this.message + "_" + "YEAR" + " "+ this.year;
 		}
-		this.message = this.message + "_";
+		this.message = this.message + "\n";
 	}
 }

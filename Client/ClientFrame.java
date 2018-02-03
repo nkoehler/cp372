@@ -152,7 +152,7 @@ public class ClientFrame {
 		JButton btnGetAll = new JButton("Get All");
 		btnGetAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String message = "GET_ALL";
+				String message = "GET_ALL\n";
 				//send message
 			}
 		});
