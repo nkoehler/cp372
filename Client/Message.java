@@ -32,14 +32,14 @@ public class Message {
 	}
 	boolean year_check(String year) {
 		try {
-			int x =Integer.parseInt(year);
+			Integer.parseInt(year);
 			return true;
 		}catch(Exception e) {
 			return false;
 		}
 	}
 	boolean validate() {
-		if(this.type == "SUBMIT"||this.type == "UPDATE") {
+		/*if(this.type == "SUBMIT"||this.type == "UPDATE") {
 			if(ISBN_check(this.ISBN)) {
 				if(this.year != "") {
 					return year_check(this.year);
@@ -58,9 +58,10 @@ public class Message {
 				}
 			}
 		}
-		return false;
+		return false;*/
+		return true;
 	}
-	void format() {
+	public String toString() {
 		this.message = this.type;
 		if(this.ISBN != "") {
 			this.message = this.message + "_" + "ISBN" + " "+ this.ISBN;
@@ -77,6 +78,7 @@ public class Message {
 		if(this.year != "") {
 			this.message = this.message + "_" + "YEAR" + " "+ this.year;
 		}
-		this.message = this.message + "\n";
+		System.out.println(this.message);
+		return this.message;
 	}
 }

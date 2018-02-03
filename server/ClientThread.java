@@ -7,6 +7,8 @@ import java.io.PrintWriter;
 public class ClientThread extends Thread {
 	Socket client = null;
 	Bibliography bib = null;
+	BufferedReader input;
+	PrintWriter output;
 	
 	public ClientThread(Socket client, Bibliography bib) {
 		this.client = client;
@@ -15,12 +17,12 @@ public class ClientThread extends Thread {
 	
 	public void run() {
 		try {
-			BufferedReader input = new BufferedReader(new InputStreamReader(this.client.getInputStream()));
-			PrintWriter output = new PrintWriter(this.client.getOutputStream(), true);
+			this.input = new BufferedReader(new InputStreamReader(this.client.getInputStream()));
+			this.output = new PrintWriter(this.client.getOutputStream(), true);
 			
 			String msg = "";
 			while((msg = input.readLine()) != null) {
-				//System.out.println(msg.replace('_', ' '));
+				System.out.println(msg.replace('_', ' '));
 				
 				Datagram d = new Datagram(msg);
 				
@@ -45,16 +47,20 @@ public class ClientThread extends Thread {
 	
 	private void parse(Datagram data, PrintWriter out) {
 		if(data.msg.startsWith("SUBMIT")) {
-			bib.Add(data.book);
+			String r = bib.Add(data.book);
+			this.output.println(r);
 		}
 		else if(data.msg.startsWith("UPDATE")) {
-			bib.Update(data.book);
+			String r = bib.Update(data.book);
+			this.output.println(r);
 		}
 		else if(data.msg.startsWith("GET")) {
-			bib.Get(data);
+			String r = bib.Get(data);
+			this.output.println(r);
 		}
 		else if(data.msg.startsWith("REMOVE")) {
-			bib.Remove(data.book);
+			String r = bib.Remove(data.book);
+			this.output.println(r);
 		}
 		
 		System.out.println(bib.toString());

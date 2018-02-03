@@ -6,12 +6,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
-import javax.swing.JScrollBar;
 import javax.swing.JTextPane;
-import javax.swing.JTextArea;
 
 public class ClientFrame {
-
+	public ServerCommunication server;
 	private JFrame frame;
 	private JTextField textField_Type;
 	private JLabel lblNewLabel;
@@ -25,6 +23,8 @@ public class ClientFrame {
 	private JTextField textField_Publisher;
 	private JLabel lblNewLabel_5;
 	private JTextField textField_Year;
+	
+	private JTextPane display;
 
 	/**
 	 * Launch the application.
@@ -51,9 +51,17 @@ public class ClientFrame {
 	}
 	
 	public void ConnectToServer() {
-		Thread serverThread = new Thread(new ServerThread("localhost", 5656));
-		
-		serverThread.start();
+		this.server = new ServerCommunication("localhost", 5656, display);
+	}
+	
+	public void DisconnectFromServer() {
+		if(this.server != null)
+			this.server.Close();
+	}
+	
+	public void SendToServer(String msg) {
+		if(this.server != null)
+			this.server.Send(msg);
 	}
 
 	/**
@@ -62,7 +70,14 @@ public class ClientFrame {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 800, 400);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		        DisconnectFromServer();
+		        System.exit(0);
+		    }
+		});
 		frame.getContentPane().setLayout(null);
 		
 		JButton btnSend = new JButton("Send");
@@ -70,11 +85,12 @@ public class ClientFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				Message message = new Message(textField_Type.getText(),textField_ISBN.getText(),textField_Title.getText(),textField_Author.getText(),textField_Publisher.getText(),textField_Year.getText());
 				if(message.validate()) {
-					message.format();
 					// send message.message
+					SendToServer(message.toString());
 					
 				}else {
 					//display error on the display pane
+					display.setText("ERROR");
 				}
 			}
 		});
@@ -152,14 +168,14 @@ public class ClientFrame {
 		JButton btnGetAll = new JButton("Get All");
 		btnGetAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String message = "GET_ALL\n";
-				//send message
+				String message = "GET_ALL";
+				SendToServer(message);
 			}
 		});
 		btnGetAll.setBounds(355, 106, 89, 23);
 		frame.getContentPane().add(btnGetAll);
 		
-		JTextPane display = new JTextPane();
+		display = new JTextPane();
 		display.setBounds(454, 38, 320, 295);
 		frame.getContentPane().add(display);
 	}
