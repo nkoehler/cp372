@@ -9,7 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
-public class ClientFrame {
+public class Client {
 	public ServerCommunication server;
 	private JFrame frame;
 	private JTextField textField_Type;
@@ -26,6 +26,8 @@ public class ClientFrame {
 	private JTextField textField_Year;
 	
 	private JTextPane display;
+	
+	private int port;
 
 	/**
 	 * Launch the application.
@@ -34,7 +36,16 @@ public class ClientFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					ClientFrame window = new ClientFrame();
+					if(args.length <= 0) {
+						System.out.println("Please enter a port as the argument.");
+						System.exit(-1);
+					}
+						
+					int port = Integer.parseInt(args[0]);
+					
+					System.out.println("Starting client on port " + port);
+					
+					Client window = new Client(port);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -46,13 +57,14 @@ public class ClientFrame {
 	/**
 	 * Create the application.
 	 */
-	public ClientFrame() {
+	public Client(int port) {
+		this.port = port;
 		initialize();
 		ConnectToServer();
 	}
 	
 	public void ConnectToServer() {
-		this.server = new ServerCommunication("localhost", 5656, display);
+		this.server = new ServerCommunication("localhost", this.port, display);
 	}
 	
 	public void DisconnectFromServer() {
