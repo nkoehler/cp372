@@ -110,8 +110,8 @@ public class Client {
 		btnSend.setBounds(355, 38, 89, 23);
 		frame.getContentPane().add(btnSend);
 		
-		JButton btnClear = new JButton("Clear");
-		btnClear.addActionListener(new ActionListener() {
+		JButton btnClearL = new JButton("<< Clear");
+		btnClearL.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				textField_Type.setText("");
 				textField_ISBN.setText("");
@@ -119,11 +119,11 @@ public class Client {
 				textField_Author.setText("");
 				textField_Publisher.setText("");
 				textField_Year.setText("");
-				display.setText("");
+				
 			}
 		});
-		btnClear.setBounds(355, 72, 89, 23);
-		frame.getContentPane().add(btnClear);
+		btnClearL.setBounds(355, 72, 89, 23);
+		frame.getContentPane().add(btnClearL);
 		
 		textField_Type = new JTextField();
 		textField_Type.setBounds(10, 39, 314, 20);
@@ -162,7 +162,7 @@ public class Client {
 		textField_Author.setColumns(10);
 		
 		lblNewLabel_4 = new JLabel("Publisher");
-		lblNewLabel_4.setBounds(10, 238, 46, 14);
+		lblNewLabel_4.setBounds(10, 238, 89, 14);
 		frame.getContentPane().add(lblNewLabel_4);
 		
 		textField_Publisher = new JTextField();
@@ -186,7 +186,7 @@ public class Client {
 				SendToServer(message);
 			}
 		});
-		btnGetAll.setBounds(355, 106, 89, 23);
+		btnGetAll.setBounds(355, 140, 89, 23);
 		frame.getContentPane().add(btnGetAll);
 		
 		display = new JTextPane();
@@ -196,5 +196,14 @@ public class Client {
 		JScrollPane sp = new JScrollPane(display);
 		sp.setBounds(454, 38, 320, 295);
 	    frame.getContentPane().add(sp);
+	    
+	    JButton btnClearR = new JButton("Clear >>");
+	    btnClearR.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent arg0) {
+	    		display.setText("");
+	    	}
+	    });
+	    btnClearR.setBounds(355, 106, 89, 23);
+	    frame.getContentPane().add(btnClearR);
 	}
 }

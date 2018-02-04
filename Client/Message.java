@@ -51,13 +51,13 @@ public class Message {
 		}else if(this.type.equals("REMOVE")||this.type.equals("GET")) {
 			if(!this.ISBN.equals("")) {
 				if(ISBN_check(this.ISBN)) {
-					if(!this.year.equals("")) {
-						return year_check(this.year);
-					}else {
-						return true;
-					}
+					return false;
 				}
 			}
+			if(!this.year.equals("")) {
+				return year_check(this.year);
+			}
+			return true;
 		}
 		return false;
 	}
