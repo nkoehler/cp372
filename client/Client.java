@@ -103,7 +103,7 @@ public class Client {
 					
 				}else {
 					//display error on the display pane
-					display.setText("ERROR");
+					display.setText(display.getText() + "Error: ISBN or Year entered is invalid." + "\n");
 				}
 			}
 		});
