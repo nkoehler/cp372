@@ -62,16 +62,36 @@ public class Sender {
             while((read = bufferedReader.read(buffer)) > 0) {
             	if(read < dataSize) eof = true;
             	
-                byte[] data = this.toBytes(buffer);
+            	byte[] data = this.toBytes(buffer);  // Get data
                 
-                Packet p = new Packet(sequence, eof, read, data);
+                Packet p = new Packet(sequence, eof, read, data); // Create new packet
                 
-                byte[] packet = p.GetPacket();
+                byte[] packet = p.GetPacket(); // Get sendable packet
                 		
-                DatagramPacket dp = new DatagramPacket(packet, packet.length);
+                DatagramPacket dp = new DatagramPacket(packet, packet.length); // Create packet to send
                 
-                this.udpData.send(dp);
+                byte[] ackPacket = new byte[1]; // Initialize empty ack buffer
                 
+                DatagramPacket ack = new DatagramPacket(ackPacket, ackPacket.length); // Create empty ack packet
+            	
+            	boolean ackValid = false;
+            	while(!ackValid) {
+            		this.udpData.send(dp);
+                    
+                    try {
+                    	this.udpAck.receive(ack);
+                    	
+                    	Ack a = new Ack(ack.getData());
+                    	if(a.Validate(p) == false) throw new IOException("Invalid ack");
+                    	ackValid = true;
+                    }
+                    catch(IOException ex) { // will also catch SocketTimeoutException
+                    	// do nothing, let loop handle it
+                    }
+            	}
+            	
+            	// Sent packet and received valid ack for it
+            	// Increment sequence number and continue
                 sequence++;
             }   
 
@@ -86,6 +106,7 @@ public class Sender {
             System.out.println("Error reading " + this.filename);
         }
 	}
+	
 	
 	private byte[] toBytes(char[] chars) {
 	    CharBuffer charBuffer = CharBuffer.wrap(chars);
