@@ -1,16 +1,11 @@
-import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 
 public class Sender {
 	DatagramSocket udpData;
@@ -39,51 +34,58 @@ public class Sender {
 		}
 		
 		try {
-			this.udpData = new DatagramSocket(this.dataPort, this.receiverAddress);
+			this.udpData = new DatagramSocket();
 			this.udpAck = new DatagramSocket(this.ackPort, this.receiverAddress);
 			this.udpAck.setSoTimeout(this.timeout);
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
+		
 	}
 	
 	public void Transmit() {
-        char[] buffer = new char[dataSize];
+        byte[] buffer = new byte[dataSize];
         int read = 0;
         int sequence = 0;
         boolean eof = false;
 
         try {
 
-            FileReader fileReader = new FileReader(this.filename);
+        	FileInputStream fp = new FileInputStream(this.filename);
 
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-            while((read = bufferedReader.read(buffer)) > 0) {
+            while((read = fp.read(buffer)) > 0) {
             	if(read < dataSize) eof = true;
             	
-            	byte[] data = this.toBytes(buffer);  // Get data
+            	byte[] data = buffer;  // Get data
                 
                 Packet p = new Packet(sequence, eof, read, data); // Create new packet
                 
                 byte[] packet = p.GetPacket(); // Get sendable packet
-                		
-                DatagramPacket dp = new DatagramPacket(packet, packet.length); // Create packet to send
+					
+                DatagramPacket dp = new DatagramPacket(packet, packet.length, this.receiverAddress, this.dataPort); // Create packet to send
                 
-                byte[] ackPacket = new byte[1]; // Initialize empty ack buffer
+                Ack fakeAck = new Ack(-1);
                 
-                DatagramPacket ack = new DatagramPacket(ackPacket, ackPacket.length); // Create empty ack packet
+                byte[] ackPacket = fakeAck.GetPacket(); // Initialize fake empty ack buffer
+                
+                DatagramPacket ack = new DatagramPacket(ackPacket, ackPacket.length, this.receiverAddress, this.ackPort); // Create empty ack packet
             	
             	boolean ackValid = false;
             	while(!ackValid) {
-            		this.udpData.send(dp);
-                    
                     try {
+                    	System.out.println("Attempting send...");
+
+                    	this.udpData.send(dp);
+                    	
                     	this.udpAck.receive(ack);
+                    	
+                    	System.out.println("Sent " + packet.length + " bytes with payload of " + p.size + " bytes for sequence " + p.sequence);
                     	
                     	Ack a = new Ack(ack.getData());
                     	if(a.Validate(p) == false) throw new IOException("Invalid ack");
                     	ackValid = true;
+                    	
+                    	System.out.println("Received ack for sequence " + a.sequence);
                     }
                     catch(IOException ex) { // will also catch SocketTimeoutException
                     	// do nothing, let loop handle it
@@ -94,10 +96,10 @@ public class Sender {
             	// Increment sequence number and continue
                 sequence++;
             }   
-
             
-            bufferedReader.close();       
-            fileReader.close();
+            System.out.println("Transmission complete, " + this.filename + " sent");
+            
+            fp.close();
         }
         catch(FileNotFoundException ex) {
             System.out.println("Unable to open " + this.filename);               
@@ -105,16 +107,5 @@ public class Sender {
         catch(IOException ex) {
             System.out.println("Error reading " + this.filename);
         }
-	}
-	
-	
-	private byte[] toBytes(char[] chars) {
-	    CharBuffer charBuffer = CharBuffer.wrap(chars);
-	    ByteBuffer byteBuffer = Charset.forName("UTF-8").encode(charBuffer);
-	    byte[] bytes = Arrays.copyOfRange(byteBuffer.array(),
-	            byteBuffer.position(), byteBuffer.limit());
-	    Arrays.fill(charBuffer.array(), '\u0000'); // clear sensitive data
-	    Arrays.fill(byteBuffer.array(), (byte) 0); // clear sensitive data
-	    return bytes;
 	}
 }

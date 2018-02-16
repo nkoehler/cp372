@@ -1,3 +1,4 @@
+import java.nio.ByteBuffer;
 
 public class Packet {
 	public int sequence;
@@ -13,16 +14,16 @@ public class Packet {
 	}
 	
 	public Packet(byte[] packet) {
-		this.sequence = packet[0];
-		this.eof = this.getEOFStatus(packet[1]);
-		this.size = packet[2];
+		this.sequence = this.convertByteSequenceToSequence(packet);
+		this.eof = this.convertByteEOFToEOF(packet);
+		this.size = this.convertByteSizeToSize(packet);
 		this.data = this.getData(packet);
 	}
 	
 	public byte[] GetPacket() {
-		byte seq = (byte) this.sequence;
-		byte end = (byte) (this.eof ? 1 : 0);
-		byte siz = (byte) this.size;
+		byte[] seq = ByteBuffer.allocate(4).putInt(this.sequence).array(); // Support up to 214gb file
+		byte[] end = ByteBuffer.allocate(4).putInt(this.convertBooleanToInt(this.eof)).array();
+		byte[] siz = ByteBuffer.allocate(4).putInt(this.size).array();
 		
 		byte[] header = this.createByteHeaderArray(seq, end, siz);
 		byte[] packet = this.concatenateByteArrays(header, this.data);
@@ -37,24 +38,54 @@ public class Packet {
 	    return result;
 	}
 	
-	private byte[] createByteHeaderArray(byte seq, byte end, byte siz) {
-		byte[] result = new byte[3];
-		result[0] = seq;
-		result[1] = end;
-		result[2] = siz;
+	private byte[] createByteHeaderArray(byte[] seq, byte[] end, byte siz[]) {
+		byte[] result = new byte[seq.length + end.length + siz.length];
+		result = this.concatenateByteArrays(seq, end);
+		result = this.concatenateByteArrays(result, siz);
 		return result;
 	}
 	
-	private boolean getEOFStatus(byte packetEOF) {
-		if(packetEOF == 1)
+	private int convertByteSequenceToSequence(byte[] packet)
+	{
+		byte[] result = new byte[4];
+		result[0] = packet[0];
+		result[1] = packet[1];
+		result[2] = packet[2];
+		result[3] = packet[3];
+		return ByteBuffer.wrap(result).getInt();
+	}
+	
+	private boolean convertByteEOFToEOF(byte[] packet)
+	{
+		byte[] result = new byte[4];
+		result[0] = packet[4];
+		result[1] = packet[5];
+		result[2] = packet[6];
+		result[3] = packet[7];
+		int res = ByteBuffer.wrap(result).getInt();
+		if(res == 1)
 			return true;
 		else
 			return false;
 	}
 	
+	private int convertByteSizeToSize(byte[] packet)
+	{
+		byte[] result = new byte[4];
+		result[0] = packet[8];
+		result[1] = packet[9];
+		result[2] = packet[10];
+		result[3] = packet[11];
+		return ByteBuffer.wrap(result).getInt();
+	}
+	
 	private byte[] getData(byte[] packet) {
-		byte[] result = new byte[packet.length - 3];
-		System.arraycopy(packet, 3, result, 0, packet.length - 3);
+		byte[] result = new byte[packet.length - 12];
+		System.arraycopy(packet, 12, result, 0, packet.length - 12);
 		return result;
+	}
+	
+	private int convertBooleanToInt(boolean b) {
+		return this.eof ? 1 : 0;
 	}
 }
