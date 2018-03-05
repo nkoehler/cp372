@@ -6,6 +6,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import javax.swing.JLabel;
+
 
 public class Receiver {
 	DatagramSocket udpData;
@@ -16,14 +18,18 @@ public class Receiver {
 	int dataPort;
 	int ackPort;
 	String filename;
+	boolean reliable;
+	JLabel packetNum;
 	
 	int dataSize = 100; // 100 bytes of data per packet
 	
-	public Receiver(String host, int dataPort, int ackPort, String filename) {
+	public Receiver(String host, int dataPort, int ackPort, String filename, boolean reliable, JLabel packetNum) {
 		this.host = host;
 		this.dataPort = dataPort;
 		this.ackPort = ackPort;
 		this.filename = filename;
+		this.reliable = reliable;
+		this.packetNum = packetNum;
 		
 		try {
 			this.senderAddress = InetAddress.getByName(this.host);
@@ -41,6 +47,7 @@ public class Receiver {
 	
 	public void Collect() {
         int sequence = 0;
+        int rcheck = 0;
         boolean eof = false;
 
         try {
@@ -68,8 +75,16 @@ public class Receiver {
         			byte[] ackbuf = a.GetPacket();
         			
         			DatagramPacket ack = new DatagramPacket(ackbuf, ackbuf.length, this.senderAddress, this.ackPort);
+        			if(this.reliable == false) {
+        				if(rcheck++%10 != 0) {
+        					this.udpAck.send(ack);
+        					packetNum.setText(Integer.toString(sequence));
+        				}
+        			}else {
+        				this.udpAck.send(ack);
+    					packetNum.setText(Integer.toString(sequence));
+        			}
         			
-        			this.udpAck.send(ack);
         			
         			System.out.println("Sent ack for sequence " + p.sequence);
         			
