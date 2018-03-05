@@ -20,16 +20,18 @@ public class Client {
 	String filename;
 	boolean reliable;
 	JLabel packetNum;
+	JLabel status;
 	
 	int dataSize = 100; // 100 bytes of data per packet
 	
-	public Client(String host, int dataPort, int ackPort, String filename, boolean reliable, JLabel packetNum) {
+	public Client(String host, int dataPort, int ackPort, String filename, boolean reliable, JLabel packetNum, JLabel status) {
 		this.host = host;
 		this.dataPort = dataPort;
 		this.ackPort = ackPort;
 		this.filename = filename;
 		this.reliable = reliable;
 		this.packetNum = packetNum;
+		this.status = status;
 		
 		try {
 			this.senderAddress = InetAddress.getByName(this.host);
@@ -49,6 +51,7 @@ public class Client {
         int sequence = 0;
         int rcheck = 0;
         boolean eof = false;
+        status.setText("Transmitting");
 
         try {
         	FileOutputStream fp = new FileOutputStream(this.filename);
@@ -101,6 +104,7 @@ public class Client {
         	}
         	
         	System.out.println("Transmission complete, " + this.filename + " written");
+        	status.setText("Transmission Finished");
             
             fp.close();
         }

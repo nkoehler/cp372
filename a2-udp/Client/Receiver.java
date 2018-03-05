@@ -44,7 +44,7 @@ public class Receiver {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 376, 247);
+		frame.setBounds(100, 100, 376, 267);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
@@ -78,6 +78,10 @@ public class Receiver {
 		Reliable.setBounds(200, 135, 129, 22);
 		frame.getContentPane().add(Reliable);
 		
+		JLabel lblStatus = new JLabel("");
+		lblStatus.setBounds(10, 194, 221, 14);
+		frame.getContentPane().add(lblStatus);
+		
 		JButton btnTransfer = new JButton("Transfer");
 		btnTransfer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -96,7 +100,7 @@ public class Receiver {
 				String file = filename.getText();
 				boolean bool = Reliable.getState();
 
-				Client receiver = new Client(address, dataPort, ackPort, file, bool, lblPacketsReceived);
+				Client receiver = new Client(address, dataPort, ackPort, file, bool, lblPacketsReceived, lblStatus);
 				Thread thread = new Thread(new AsynchReceiver(receiver));
 				thread.start();
 				
@@ -125,6 +129,7 @@ public class Receiver {
 		JLabel lblNewLabel = new JLabel("Current number of received in-order packets");
 		lblNewLabel.setBounds(10, 169, 278, 14);
 		frame.getContentPane().add(lblNewLabel);
+		
 		
 	}
 }
