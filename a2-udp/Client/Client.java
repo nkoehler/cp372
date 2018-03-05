@@ -1,124 +1,114 @@
-import java.awt.EventQueue;
-import javax.swing.JFrame;
-import javax.swing.JTextField;
-import javax.swing.JButton;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import javax.swing.JLabel;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.JCheckBoxMenuItem;
-import java.awt.Color;
+
 
 public class Client {
-
-	private JFrame frame;
-	private JTextField HostAddress;
-	private JTextField RcvPort;
-	private JTextField SendPort;
-	private JTextField filename;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Client window = new Client();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+	DatagramSocket udpData;
+	DatagramSocket udpAck;
+	InetAddress senderAddress;
+	
+	String host;
+	int dataPort;
+	int ackPort;
+	String filename;
+	boolean reliable;
+	JLabel packetNum;
+	
+	int dataSize = 100; // 100 bytes of data per packet
+	
+	public Client(String host, int dataPort, int ackPort, String filename, boolean reliable, JLabel packetNum) {
+		this.host = host;
+		this.dataPort = dataPort;
+		this.ackPort = ackPort;
+		this.filename = filename;
+		this.reliable = reliable;
+		this.packetNum = packetNum;
+		
+		try {
+			this.senderAddress = InetAddress.getByName(this.host);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			this.udpData = new DatagramSocket(this.dataPort, this.senderAddress);
+			this.udpAck = new DatagramSocket();
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
 	}
+	
+	public void Collect() {
+        int sequence = 0;
+        int rcheck = 0;
+        boolean eof = false;
 
-	/**
-	 * Create the application.
-	 */
-	public Client() {
-		initialize();
-	}
-
-	/**
-	 * Initialize the contents of the frame.
-	 */
-	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 376, 247);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(null);
-		
-		HostAddress = new JTextField();
-		HostAddress.setBounds(108, 11, 221, 20);
-		frame.getContentPane().add(HostAddress);
-		HostAddress.setColumns(10);
-		
-		RcvPort = new JTextField();
-		RcvPort.setBounds(108, 42, 221, 20);
-		frame.getContentPane().add(RcvPort);
-		RcvPort.setColumns(10);
-		
-		SendPort = new JTextField();
-		SendPort.setBounds(108, 73, 221, 20);
-		frame.getContentPane().add(SendPort);
-		SendPort.setColumns(10);
-		
-		filename = new JTextField();
-		filename.setBounds(108, 104, 221, 20);
-		frame.getContentPane().add(filename);
-		filename.setColumns(10);
-		
-		JLabel lblPacketsReceived = new JLabel("0");
-		lblPacketsReceived.setBounds(298, 168, 46, 14);
-		frame.getContentPane().add(lblPacketsReceived);
-		
-		JCheckBoxMenuItem Reliable = new JCheckBoxMenuItem("Reliable");
-		Reliable.setSelected(true);
-		Reliable.setBackground(Color.LIGHT_GRAY);
-		Reliable.setBounds(200, 135, 129, 22);
-		frame.getContentPane().add(Reliable);
-		
-		JButton btnTransfer = new JButton("Transfer");
-		btnTransfer.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				//Transfer
-				
-				String address = HostAddress.getText();
-				int dataPort = Integer.parseInt(RcvPort.getText());
-				int ackPort = Integer.parseInt(SendPort.getText());
-				String file = filename.getText();
-				boolean bool = Reliable.getState();
-
-				Receiver receiver = new Receiver(address, dataPort, ackPort, file, bool, lblPacketsReceived);
-				Thread thread = new Thread(new AsynchReceiver(receiver));
-				thread.start();
-				
-				
-			}
-		});
-		btnTransfer.setBounds(101, 134, 89, 23);
-		frame.getContentPane().add(btnTransfer);
-		
-		
-		JLabel lblNewLabel_1 = new JLabel("Host address");
-		lblNewLabel_1.setBounds(10, 14, 117, 14);
-		frame.getContentPane().add(lblNewLabel_1);
-		
-		JLabel lblNewLabel_2 = new JLabel("Receiver Port");
-		lblNewLabel_2.setBounds(10, 45, 117, 14);
-		frame.getContentPane().add(lblNewLabel_2);
-		
-		JLabel lblNewLabel_3 = new JLabel("Sender Port");
-		lblNewLabel_3.setBounds(10, 76, 117, 14);
-		frame.getContentPane().add(lblNewLabel_3);
-		
-		JLabel lblNewLabel_4 = new JLabel("Filename");
-		lblNewLabel_4.setBounds(10, 107, 75, 14);
-		frame.getContentPane().add(lblNewLabel_4);
-		
-		JLabel lblNewLabel = new JLabel("Current number of received in-order packets");
-		lblNewLabel.setBounds(10, 169, 278, 14);
-		frame.getContentPane().add(lblNewLabel);
-		
+        try {
+        	FileOutputStream fp = new FileOutputStream(this.filename);
+        	
+        	while(!eof) {
+        		Packet fakePacketForBufferOnly = new Packet(sequence, eof, this.dataSize, new byte[this.dataSize]);
+        		byte[] buffer = fakePacketForBufferOnly.GetPacket();
+        		
+        		DatagramPacket dp = new DatagramPacket(buffer, buffer.length, this.senderAddress, this.dataPort);
+        		try {
+        			System.out.println("Waiting for data...");
+        			
+        			this.udpData.receive(dp);
+        			
+        			Packet p = new Packet(dp.getData());
+        			
+        			if(sequence < p.sequence) throw new IOException("Out of order packet");
+        			else if(sequence == p.sequence) fp.write(p.data, 0, p.size);
+        			
+        			System.out.println("Received " + dp.getData().length + " bytes with payload of " + p.size + " bytes for sequence " + p.sequence);
+        			
+        			Ack a = new Ack(p.sequence); // Ack the sequence received, not our current sequence
+        			
+        			byte[] ackbuf = a.GetPacket();
+        			
+        			DatagramPacket ack = new DatagramPacket(ackbuf, ackbuf.length, this.senderAddress, this.ackPort);
+        			if(this.reliable == false) {
+        				if(rcheck++%10 != 0) {
+        					this.udpAck.send(ack);
+        					packetNum.setText(Integer.toString(sequence));
+        				}
+        			}else {
+        				this.udpAck.send(ack);
+    					packetNum.setText(Integer.toString(sequence));
+        			}
+        			
+        			
+        			System.out.println("Sent ack for sequence " + p.sequence);
+        			
+        			if(sequence == p.sequence) {
+        				sequence++; 
+        				eof = p.eof;
+        			}
+        			
+        		}
+        		catch(IOException ex) {
+        			
+        		}
+        		
+        	}
+        	
+        	System.out.println("Transmission complete, " + this.filename + " written");
+            
+            fp.close();
+        }
+        catch(FileNotFoundException ex) {
+            System.out.println("Unable to open " + this.filename);               
+        }
+        catch(IOException ex) {
+            System.out.println("Error reading " + this.filename);
+        }
 	}
 }

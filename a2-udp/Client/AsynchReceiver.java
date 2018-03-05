@@ -1,7 +1,7 @@
 
 public class AsynchReceiver extends Thread{
-	Receiver r;
-	AsynchReceiver(Receiver r){
+	Client r;
+	AsynchReceiver(Client r){
 		this.r = r;
 	}
 	public void run() {
