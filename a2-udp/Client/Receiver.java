@@ -83,6 +83,13 @@ public class Receiver {
 			public void actionPerformed(ActionEvent arg0) {
 				//Transfer
 				
+				HostAddress.setEnabled(false);
+				RcvPort.setEnabled(false);
+				SendPort.setEnabled(false);
+				filename.setEnabled(false);
+				Reliable.setEnabled(false);
+				btnTransfer.setEnabled(false);
+				
 				String address = HostAddress.getText();
 				int dataPort = Integer.parseInt(RcvPort.getText());
 				int ackPort = Integer.parseInt(SendPort.getText());
@@ -92,7 +99,6 @@ public class Receiver {
 				Client receiver = new Client(address, dataPort, ackPort, file, bool, lblPacketsReceived);
 				Thread thread = new Thread(new AsynchReceiver(receiver));
 				thread.start();
-				
 				
 			}
 		});

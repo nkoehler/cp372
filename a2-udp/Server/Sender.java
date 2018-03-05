@@ -1,3 +1,5 @@
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 public class Sender {
 
@@ -14,8 +16,10 @@ public class Sender {
 		int timeout = Integer.parseInt(args[4]);
 		
 		Server s = new Server(host, dataPort, ackPort, filename, timeout);
+		ZonedDateTime now = ZonedDateTime.now();
 		s.Transmit();
-
+		long seconds = now.until(ZonedDateTime.now(), ChronoUnit.MILLIS);
+		System.out.println("Total Transmission Time is " + seconds + "ms");
 	}
 
 }
