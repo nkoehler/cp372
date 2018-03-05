@@ -6,15 +6,18 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.JToggleButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JCheckBoxMenuItem;
+import java.awt.Color;
 
 public class GUI {
 
 	private JFrame frame;
-	private JTextField HostAddres;
+	private JTextField HostAddress;
 	private JTextField RcvPort;
 	private JTextField SendPort;
 	private JTextField filename;
-	private final JToggleButton tglbtnReliability = new JToggleButton("Reliable");
 
 	/**
 	 * Launch the application.
@@ -44,14 +47,14 @@ public class GUI {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 355, 243);
+		frame.setBounds(100, 100, 436, 303);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
-		HostAddres = new JTextField();
-		HostAddres.setBounds(81, 11, 221, 20);
-		frame.getContentPane().add(HostAddres);
-		HostAddres.setColumns(10);
+		HostAddress = new JTextField();
+		HostAddress.setBounds(81, 11, 221, 20);
+		frame.getContentPane().add(HostAddress);
+		HostAddress.setColumns(10);
 		
 		RcvPort = new JTextField();
 		RcvPort.setBounds(81, 42, 221, 20);
@@ -69,6 +72,19 @@ public class GUI {
 		filename.setColumns(10);
 		
 		JButton btnTransfer = new JButton("Transfer");
+		btnTransfer.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//Transfer
+				String address = HostAddress.getText();
+				int dataPort = Integer.parseInt(RcvPort.getText());
+				int ackPort = Integer.parseInt(SendPort.getText());
+				String file = filename.getText();
+				Receiver receiver = new Receiver(address, dataPort, ackPort, file);
+				
+				
+				
+			}
+		});
 		btnTransfer.setBounds(81, 135, 89, 23);
 		frame.getContentPane().add(btnTransfer);
 		
@@ -91,12 +107,15 @@ public class GUI {
 		JLabel lblNewLabel_4 = new JLabel("Filename");
 		lblNewLabel_4.setBounds(10, 107, 46, 14);
 		frame.getContentPane().add(lblNewLabel_4);
-		tglbtnReliability.setSelected(true);
-		tglbtnReliability.setBounds(180, 135, 122, 23);
-		frame.getContentPane().add(tglbtnReliability);
 		
 		JLabel lblNewLabel = new JLabel("Current number of received in-order packets");
 		lblNewLabel.setBounds(10, 169, 236, 14);
 		frame.getContentPane().add(lblNewLabel);
+		
+		JCheckBoxMenuItem chckbxmntmReliable = new JCheckBoxMenuItem("Reliable");
+		chckbxmntmReliable.setSelected(true);
+		chckbxmntmReliable.setBackground(Color.LIGHT_GRAY);
+		chckbxmntmReliable.setBounds(180, 136, 129, 22);
+		frame.getContentPane().add(chckbxmntmReliable);
 	}
 }
